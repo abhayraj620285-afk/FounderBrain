@@ -1,10 +1,10 @@
 package com.abhayraj.founderbrain.controller;
 
+import com.abhayraj.founderbrain.dto.HealthResponse;
 import com.abhayraj.founderbrain.service.MetricsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 
 @RestController
 @RequestMapping("/metrics")
@@ -12,8 +12,8 @@ import java.util.Map;
 public class MetricsController {
     private final MetricsService metricsService;
 
-    @GetMapping("/{startupId}")
-    public Map<String, Object> getMetrics(@PathVariable Long startupId) {
-        return (Map<String, Object>) metricsService.getStartupMetrics(startupId);
+    @GetMapping("/health/{startupId}")
+    public HealthResponse getHealth(@PathVariable Long startupId) {
+        return metricsService.analyzeStartup(startupId);
     }
 }

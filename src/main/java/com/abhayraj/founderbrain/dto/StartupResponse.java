@@ -11,4 +11,8 @@ public class StartupResponse {
     private String industry;
     private Double revenue;
     private Integer users;
+    private Double lastMonthRevenue;
+    private Double monthlyExpenses;
+    private Double cashReserve;
+
 }

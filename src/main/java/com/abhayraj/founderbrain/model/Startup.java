@@ -22,4 +22,7 @@ public class Startup {
     @JsonIgnore
     @JoinColumn(name = "user_id")
     private User user;
+    private Double lastMonthRevenue;
+    private Double monthlyExpenses;
+    private Double cashReserve;
 }

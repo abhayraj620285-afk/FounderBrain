@@ -34,4 +34,16 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    @ExceptionHandler(StartupNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleStartupNotFound(StartupNotFoundException ex) {
+
+        ErrorResponse error = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.NOT_FOUND.value(),
+                "Startup Not Found",
+                ex.getMessage()
+        );
+
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
 }

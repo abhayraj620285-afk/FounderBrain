@@ -42,13 +42,19 @@ public class StartupService {
         startup.setRevenue(request.getRevenue());
         startup.setUsers(request.getUsers());
         startup.setUser(getLoggedUser());
+        startup.setLastMonthRevenue(request.getLastMonthRevenue());
+        startup.setMonthlyExpenses(request.getMonthlyExpenses());
+        startup.setCashReserve(request.getCashReserve());
         Startup savedStartup = startupRepository.save(startup);
         return new StartupResponse(
                 savedStartup.getId(),
                 savedStartup.getName(),
                 savedStartup.getIndustry(),
                 savedStartup.getRevenue(),
-                savedStartup.getUsers()
+                savedStartup.getUsers(),
+                savedStartup.getLastMonthRevenue(),
+                startup.getMonthlyExpenses(),
+                startup.getCashReserve()
         );
     }
     public List<StartupResponse> getMyStartups() {
@@ -60,7 +66,10 @@ public class StartupService {
                         startup.getName(),
                         startup.getIndustry(),
                         startup.getRevenue(),
-                        startup.getUsers()
+                        startup.getUsers(),
+                        startup.getCashReserve(),
+                        startup.getMonthlyExpenses(),
+                        startup.getLastMonthRevenue()
                 ))
                 .toList();
     }
@@ -83,7 +92,11 @@ public class StartupService {
                 startup.getName(),
                 startup.getIndustry(),
                 startup.getRevenue(),
-                startup.getUsers()
+                startup.getUsers(),
+                startup.getLastMonthRevenue(),
+                startup.getMonthlyExpenses(),
+                startup.getCashReserve()
+
         );
 
     }
@@ -102,7 +115,9 @@ public class StartupService {
         startup.setIndustry(request.getIndustry());
         startup.setRevenue(request.getRevenue());
         startup.setUsers(request.getUsers());
-
+        startup.setLastMonthRevenue(request.getLastMonthRevenue());
+        startup.setMonthlyExpenses(request.getMonthlyExpenses());
+        startup.setCashReserve(request.getCashReserve());
         Startup updated = startupRepository.save(startup);
 
         return new StartupResponse(
@@ -110,7 +125,12 @@ public class StartupService {
                 updated.getName(),
                 updated.getIndustry(),
                 updated.getRevenue(),
-                updated.getUsers()
+                updated.getUsers(),
+                updated.getLastMonthRevenue(),
+                updated.getMonthlyExpenses(),
+                updated.getCashReserve()
+
+
         );
 
     }
@@ -138,7 +158,10 @@ public class StartupService {
                         s.getName(),
                         s.getIndustry(),
                         s.getRevenue(),
-                        s.getUsers()
+                        s.getUsers(),
+                        s.getMonthlyExpenses(),
+                        s.getCashReserve(),
+                        s.getLastMonthRevenue()
                 ))
                 .toList();
     }
