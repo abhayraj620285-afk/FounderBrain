@@ -15,7 +15,7 @@ public class HealthCalculationService {
         return cashReserve/monthlyExpenses;
     }
     public int calculateHealthScore(double growthRate,double runwayMonths){
-        int score = 20;
+        int score = 50;
         if(growthRate>20) score+=20;
         else if(growthRate>10) score+=10;
         else if(growthRate<0) score-=20;

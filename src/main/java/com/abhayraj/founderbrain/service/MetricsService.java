@@ -1,8 +1,11 @@
 package com.abhayraj.founderbrain.service;
+import com.abhayraj.founderbrain.dto.BenchmarkResponse;
 import com.abhayraj.founderbrain.dto.HealthResponse;
 import com.abhayraj.founderbrain.dto.MetricsResponse;
 import com.abhayraj.founderbrain.exception.StartupNotFoundException;
+import com.abhayraj.founderbrain.model.IndustryBenchmark;
 import com.abhayraj.founderbrain.model.Startup;
+import com.abhayraj.founderbrain.repository.IndustryBenchmarkRepository;
 import com.abhayraj.founderbrain.repository.StartupRepository;
 import com.abhayraj.founderbrain.repository.UserActivityRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +19,7 @@ public class MetricsService {
     private final UserActivityRepository activityRepository;
     private final StartupRepository startupRepository;
     private final HealthCalculationService healthCalculationService;
+    private final IndustryBenchmarkRepository industryBenchmarkRepository;
 
     public MetricsResponse getStartupMetrics(Long startupId) {
 
@@ -70,5 +74,42 @@ public class MetricsService {
             case "HIGH" -> "Urgent attention needed. Reduce expenses and increase revenue.";
             default -> "No recommendation available.";
         };
+    }
+    public BenchmarkResponse compareWithIndustry(Long startupId){
+        Startup startup = startupRepository.findById(startupId)
+                .orElseThrow(() -> new RuntimeException("Startup not found"));
+        double growth = healthCalculationService.calculateGrowthRate(
+                startup.getRevenue(),
+                startup.getLastMonthRevenue()
+        );
+        double runway = healthCalculationService.calculateRunway(
+                startup.getCashReserve(),
+                startup.getMonthlyExpenses()
+        );
+        IndustryBenchmark benchmark = industryBenchmarkRepository
+                .findByIndustry(startup.getIndustry())
+                .orElseThrow(() -> new RuntimeException("No benchmark found"));
+
+        String performance;
+        if(growth> benchmark.getAverageGrowthRate() && runway> benchmark.getAverageRunwayMonths()){
+            performance = "Above Industry Average";
+        }
+        else if(growth> benchmark.getAverageGrowthRate()){
+            performance =  "Strong Growth but Weak Runway";
+        }
+        else if(runway > benchmark.getAverageRunwayMonths()){
+            performance = "Stable but Slow Growth";
+        }
+        else {
+            performance = "Below Industry Average";
+        }
+        return new BenchmarkResponse(
+                growth,
+                benchmark.getAverageGrowthRate(),
+                runway,
+                benchmark.getAverageRunwayMonths(),
+                performance
+        );
+
     }
 }
