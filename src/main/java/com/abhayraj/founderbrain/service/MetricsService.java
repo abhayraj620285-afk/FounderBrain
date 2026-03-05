@@ -1,8 +1,5 @@
 package com.abhayraj.founderbrain.service;
-import com.abhayraj.founderbrain.dto.BenchmarkResponse;
-import com.abhayraj.founderbrain.dto.FundingResponse;
-import com.abhayraj.founderbrain.dto.HealthResponse;
-import com.abhayraj.founderbrain.dto.MetricsResponse;
+import com.abhayraj.founderbrain.dto.*;
 import com.abhayraj.founderbrain.exception.StartupNotFoundException;
 import com.abhayraj.founderbrain.model.IndustryBenchmark;
 import com.abhayraj.founderbrain.model.Startup;
@@ -149,5 +146,62 @@ public class MetricsService {
         }
 
         return new FundingResponse(signal, reason, confidence);
+    }
+    public StartupInsightResponse generateInsights(Long startupId){
+        Startup startup = startupRepository.findById(startupId)
+                .orElseThrow(() -> new RuntimeException("Startup not found"));
+
+        double growth = healthCalculationService.calculateGrowthRate(
+                startup.getRevenue(),
+                startup.getLastMonthRevenue()
+        );
+
+        double runway = healthCalculationService.calculateRunway(
+                startup.getCashReserve(),
+                startup.getMonthlyExpenses()
+        );
+        int score = healthCalculationService.calculateHealthScore(growth, runway);
+
+        String risk = healthCalculationService.determineRisk(score);
+
+        String growthInsight;
+        String runwayInsight;
+        String recommendation;
+        // growth insight
+        if (growth > 20) {
+            growthInsight = "Your startup is experiencing strong growth.";
+        } else if (growth > 10) {
+            growthInsight = "Your startup growth is healthy.";
+        } else {
+            growthInsight = "Growth is slow. Consider improving product or marketing.";
+        }
+        // Runway insight
+        if (runway > 12) {
+            runwayInsight = "Your startup has a strong financial runway.";
+        } else if (runway >= 6) {
+            runwayInsight = "Runway is moderate. Monitor expenses carefully.";
+        } else {
+            runwayInsight = "Runway is low. Consider raising capital soon.";
+        }
+        // Recommendation
+        if (growth > 20 && runway < 6) {
+            recommendation = "Strong growth but low runway. Prepare for fundraising.";
+        } else if (growth < 5 && runway > 12) {
+            recommendation = "Low growth despite strong runway. Focus on product improvement.";
+        } else if (growth > 15 && runway > 9) {
+            recommendation = "Healthy startup. Focus on scaling operations.";
+        } else {
+            recommendation = "Maintain balanced growth and monitor financial health.";
+        }
+
+        String riskInsight = "Your startup currently has " + risk + " operational risk.";
+
+        return new StartupInsightResponse(
+                growthInsight,
+                runwayInsight,
+                riskInsight,
+                recommendation
+        );
+
     }
 }
