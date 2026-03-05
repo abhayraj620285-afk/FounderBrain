@@ -1,5 +1,6 @@
 package com.abhayraj.founderbrain.service;
 import com.abhayraj.founderbrain.dto.BenchmarkResponse;
+import com.abhayraj.founderbrain.dto.FundingResponse;
 import com.abhayraj.founderbrain.dto.HealthResponse;
 import com.abhayraj.founderbrain.dto.MetricsResponse;
 import com.abhayraj.founderbrain.exception.StartupNotFoundException;
@@ -111,5 +112,42 @@ public class MetricsService {
                 performance
         );
 
+    }
+    public FundingResponse analyzeFunding(Long startupId){
+        Startup startup = startupRepository.findById(startupId)
+                .orElseThrow(() -> new RuntimeException("Startup not found"));
+        double growth = healthCalculationService.calculateGrowthRate(
+                startup.getRevenue(),
+                startup.getLastMonthRevenue()
+        );
+        double runway = healthCalculationService.calculateRunway(
+                startup.getCashReserve(),
+                startup.getMonthlyExpenses()
+        );
+        String signal;
+        String reason;
+        int confidence = 60;
+        if(growth>20 && runway<6){
+            signal = "RAISE_CAPITAL";
+            reason = "Strong growth but runway is low. Consider raising funds.";
+            confidence = 85;
+        }
+        else if (growth < 5 && runway > 12) {
+            signal = "OPTIMIZE";
+            reason = "Low growth despite strong runway. Improve product or marketing.";
+            confidence = 75;
+        }
+        else if (growth > 15 && runway > 9) {
+            signal = "SCALE";
+            reason = "Healthy growth and solid runway. Focus on scaling.";
+            confidence = 80;
+        }
+        else {
+            signal = "STABLE";
+            reason = "Balanced metrics. Monitor performance closely.";
+            confidence = 65;
+        }
+
+        return new FundingResponse(signal, reason, confidence);
     }
 }
