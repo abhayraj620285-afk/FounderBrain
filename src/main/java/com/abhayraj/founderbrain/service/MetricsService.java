@@ -204,4 +204,49 @@ public class MetricsService {
         );
 
     }
+    public AnalyticsDashboardResponse getDashboard(Long startupId){
+        Startup startup = startupRepository.findById(startupId)
+                .orElseThrow(()-> new RuntimeException("Exception not found"));
+        double growth = healthCalculationService.calculateGrowthRate(
+                startup.getRevenue(),
+                startup.getLastMonthRevenue()
+        );
+        double runway = healthCalculationService.calculateRunway(
+                startup.getCashReserve(),
+                startup.getMonthlyExpenses()
+        );
+        int score = healthCalculationService.calculateHealthScore(growth,runway);
+        String risk = healthCalculationService.determineRisk(score);
+
+        // Insights reuse
+        StartupInsightResponse insights = generateInsights(startupId);
+
+        // Dummy funding logic (upgrade later)
+        String fundingSuggestion;
+        if (score > 75) {
+            fundingSuggestion = "You are ready to raise funding.";
+        } else if (score > 50) {
+            fundingSuggestion = "Improve metrics before fundraising.";
+        } else {
+            fundingSuggestion = "Focus on survival before raising funds.";
+        }
+
+        // Dummy benchmark (replace later with DB)
+        double avgGrowth = 15;
+        double avgRunway = 10;
+
+        return new AnalyticsDashboardResponse(
+                score,
+                growth,
+                runway,
+                risk,
+                insights.getGrowthInsight(),
+                insights.getRunwayInsight(),
+                insights.getRiskInsight(),
+                insights.getActionRecommendation(),
+                fundingSuggestion,
+                avgGrowth,
+                avgRunway
+        );
+     }
 }

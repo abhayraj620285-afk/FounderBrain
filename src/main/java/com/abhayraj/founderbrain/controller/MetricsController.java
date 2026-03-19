@@ -1,9 +1,6 @@
 package com.abhayraj.founderbrain.controller;
 
-import com.abhayraj.founderbrain.dto.BenchmarkResponse;
-import com.abhayraj.founderbrain.dto.FundingResponse;
-import com.abhayraj.founderbrain.dto.HealthResponse;
-import com.abhayraj.founderbrain.dto.StartupInsightResponse;
+import com.abhayraj.founderbrain.dto.*;
 import com.abhayraj.founderbrain.service.MetricsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -30,5 +27,9 @@ public class MetricsController {
     @GetMapping("/insights/{startupId}")
     public StartupInsightResponse getInsights(@PathVariable Long startupId) {
         return metricsService.generateInsights(startupId);
+    }
+    @GetMapping("/dashboard/{startupId}")
+    public AnalyticsDashboardResponse getDashboard(@PathVariable Long startupId) {
+        return metricsService.getDashboard(startupId);
     }
 }
