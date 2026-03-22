@@ -2,6 +2,7 @@ package com.abhayraj.founderbrain.controller;
 import com.abhayraj.founderbrain.dto.StartupRequest;
 import com.abhayraj.founderbrain.dto.StartupResponse;
 import com.abhayraj.founderbrain.service.StartupService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,7 @@ public class StartupController {
 
     @PreAuthorize("hasRole('FOUNDER')")
     @PostMapping
-    public StartupResponse create(@RequestBody StartupRequest request) {
+    public StartupResponse create(@Valid @RequestBody StartupRequest request) {
         return startupService.createStartup(request);
     }
 
@@ -33,7 +34,7 @@ public class StartupController {
 
     @PutMapping("/{id}")
     public StartupResponse update(@PathVariable Long id,
-                          @RequestBody StartupRequest request) {
+                          @Valid @RequestBody StartupRequest request) {
         return startupService.updateStartup(id, request);
     }
     @PreAuthorize("hasRole('ADMIN')")

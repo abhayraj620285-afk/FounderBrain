@@ -10,7 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MetricsService {
@@ -205,18 +207,23 @@ public class MetricsService {
 
     }
     public AnalyticsDashboardResponse getDashboard(Long startupId){
+        log.info("Fetching dashboard for startupId: {}", startupId);
         Startup startup = startupRepository.findById(startupId)
                 .orElseThrow(()-> new RuntimeException("Exception not found"));
         double growth = healthCalculationService.calculateGrowthRate(
                 startup.getRevenue(),
                 startup.getLastMonthRevenue()
         );
+        log.info("Growth calculated: {}", growth);
         double runway = healthCalculationService.calculateRunway(
                 startup.getCashReserve(),
                 startup.getMonthlyExpenses()
         );
+        log.info("Growth calculated: {}", growth);
         int score = healthCalculationService.calculateHealthScore(growth,runway);
+        log.info("Runway calculated: {}", runway);
         String risk = healthCalculationService.determineRisk(score);
+        log.info("Risk level: {}", risk);
 
         // Insights reuse
         StartupInsightResponse insights = generateInsights(startupId);
@@ -232,9 +239,14 @@ public class MetricsService {
         }
 
         // Dummy benchmark (replace later with DB)
-        double avgGrowth = 15;
-        double avgRunway = 10;
+        // Benchmark from DB
+        IndustryBenchmark benchmark = industryBenchmarkRepository
+                .findByIndustry(startup.getIndustry())
+                .orElseThrow(() -> new RuntimeException("Benchmark not found"));
 
+        double avgGrowth = benchmark.getAverageGrowthRate();
+        double avgRunway = benchmark.getAverageRunwayMonths();
+        log.info("Benchmark - Avg Growth: {}, Avg Runway: {}", avgGrowth, avgRunway);
         return new AnalyticsDashboardResponse(
                 score,
                 growth,
