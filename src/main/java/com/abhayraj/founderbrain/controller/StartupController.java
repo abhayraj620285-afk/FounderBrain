@@ -1,6 +1,8 @@
 package com.abhayraj.founderbrain.controller;
+import com.abhayraj.founderbrain.dto.ApiResponse;
 import com.abhayraj.founderbrain.dto.StartupRequest;
 import com.abhayraj.founderbrain.dto.StartupResponse;
+import com.abhayraj.founderbrain.model.Startup;
 import com.abhayraj.founderbrain.service.StartupService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,29 +19,53 @@ public class StartupController {
 
     @PreAuthorize("hasRole('FOUNDER')")
     @PostMapping
-    public StartupResponse create(@Valid @RequestBody StartupRequest request) {
-        return startupService.createStartup(request);
+    public ApiResponse<StartupResponse> create(@Valid @RequestBody StartupRequest request) {
+        StartupResponse response =  startupService.createStartup(request);
+        return new ApiResponse<>(
+                "success",
+                "Startup created successfully",
+                response
+        );
+
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/my")
-    public List<StartupResponse> myStartups() {
-        return startupService.getMyStartups();
+    public ApiResponse<List<StartupResponse>> myStartups() {
+
+        List<StartupResponse>  response =  startupService.getMyStartups();
+        return new ApiResponse<>(
+                "success",
+                "Fetched all Startup successfully",
+                response
+        );
     }
 
     @GetMapping("/{id}")
-    public StartupResponse getOne(@PathVariable Long id) {
-        return startupService.getStartupById(id);
+    public ApiResponse<StartupResponse> getOne(@PathVariable Long id) {
+        StartupResponse response = startupService.getStartupById(id);
+        return new ApiResponse<>(
+                "success",
+                "Startup fetched successfully",
+                response
+        );
     }
 
     @PutMapping("/{id}")
-    public StartupResponse update(@PathVariable Long id,
+    public ApiResponse<StartupResponse> update(@PathVariable Long id,
                           @Valid @RequestBody StartupRequest request) {
-        return startupService.updateStartup(id, request);
+        StartupResponse response = startupService.updateStartup(id, request);
+        return new ApiResponse<>(
+                "success",
+                "Startup updated successfully",
+                response
+        );
+
     }
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
+
         startupService.deleteStartup(id);
     }
 }

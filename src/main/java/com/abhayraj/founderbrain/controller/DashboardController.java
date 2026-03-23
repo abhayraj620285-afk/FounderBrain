@@ -1,5 +1,6 @@
 package com.abhayraj.founderbrain.controller;
 
+import com.abhayraj.founderbrain.dto.ApiResponse;
 import com.abhayraj.founderbrain.dto.DashboardResponse;
 import com.abhayraj.founderbrain.service.DashboardService;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,13 @@ public class DashboardController {
 
     @PreAuthorize("hasRole('FOUNDER')")
     @GetMapping
-    public DashboardResponse getDashboard() {
-        return dashboardService.getDashboard();
+    public ApiResponse<DashboardResponse> getDashboard() {
+
+        DashboardResponse response =  dashboardService.getDashboard();
+        return new ApiResponse<>(
+                "success",
+                "Get Dashboard successfully",
+                response
+        );
     }
 }

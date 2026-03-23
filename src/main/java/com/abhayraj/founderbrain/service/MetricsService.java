@@ -207,7 +207,7 @@ public class MetricsService {
 
     }
     public AnalyticsDashboardResponse getDashboard(Long startupId){
-        log.info("Fetching dashboard for startupId: {}", startupId);
+        log.info("[startupId={}] Fetching dashboard", startupId);
         Startup startup = startupRepository.findById(startupId)
                 .orElseThrow(()-> new RuntimeException("Exception not found"));
         double growth = healthCalculationService.calculateGrowthRate(
@@ -219,12 +219,11 @@ public class MetricsService {
                 startup.getCashReserve(),
                 startup.getMonthlyExpenses()
         );
-        log.info("Growth calculated: {}", growth);
+        log.info("[startupId={}] Runway calculated: {}", startupId, runway);
         int score = healthCalculationService.calculateHealthScore(growth,runway);
-        log.info("Runway calculated: {}", runway);
+        log.info("[startupId={}] Health score: {}", startupId, score);
         String risk = healthCalculationService.determineRisk(score);
-        log.info("Risk level: {}", risk);
-
+        log.info("[startupId={}] Risk level: {}", startupId, risk);
         // Insights reuse
         StartupInsightResponse insights = generateInsights(startupId);
 
