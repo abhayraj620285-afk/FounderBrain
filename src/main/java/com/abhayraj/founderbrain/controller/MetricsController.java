@@ -3,6 +3,7 @@ package com.abhayraj.founderbrain.controller;
 import com.abhayraj.founderbrain.dto.*;
 import com.abhayraj.founderbrain.service.MetricsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.aop.framework.AopInfrastructureBean;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -13,23 +14,54 @@ public class MetricsController {
     private final MetricsService metricsService;
 
     @GetMapping("/health/{startupId}")
-    public HealthResponse getHealth(@PathVariable Long startupId) {
-        return metricsService.analyzeStartup(startupId);
+    public ApiResponse<HealthResponse> getHealth(@PathVariable Long startupId) {
+        HealthResponse response =  metricsService.analyzeStartup(startupId);
+        return new ApiResponse<>(
+                "success",
+                "Health analysis fetched",
+                response
+        );
     }
     @GetMapping("/benchmark/{startupId}")
-    public BenchmarkResponse compare(@PathVariable Long startupId) {
-        return metricsService.compareWithIndustry(startupId);
+    public ApiResponse<BenchmarkResponse> compare(@PathVariable Long startupId) {
+        BenchmarkResponse response =  metricsService.compareWithIndustry(startupId);
+        return new ApiResponse<>(
+                "success",
+                "Benchmark comparison fetched",
+                response
+        );
     }
     @GetMapping("/funding/{startupId}")
-    public FundingResponse analyzeFunding(@PathVariable Long startupId) {
-        return metricsService.analyzeFunding(startupId);
+    public ApiResponse<FundingResponse> analyzeFunding(@PathVariable Long startupId) {
+
+        FundingResponse response =  metricsService.analyzeFunding(startupId);
+        return new ApiResponse<>(
+                "success",
+                "Funding analysis fetched",
+                response
+        );
     }
     @GetMapping("/insights/{startupId}")
-    public StartupInsightResponse getInsights(@PathVariable Long startupId) {
-        return metricsService.generateInsights(startupId);
+    public ApiResponse<StartupInsightResponse> getInsights(@PathVariable Long startupId) {
+
+        StartupInsightResponse response = metricsService.generateInsights(startupId);
+
+        return new ApiResponse<>(
+                "success",
+                "Startup insights fetched",
+                response
+        );
     }
+
     @GetMapping("/dashboard/{startupId}")
-    public AnalyticsDashboardResponse getDashboard(@PathVariable Long startupId) {
-        return metricsService.getDashboard(startupId);
+    public ApiResponse<AnalyticsDashboardResponse> getDashboard(@PathVariable Long startupId) {
+
+        AnalyticsDashboardResponse response = metricsService.getDashboard(startupId);
+
+        return new ApiResponse<>(
+                "success",
+                "Dashboard fetched successfully",
+                response
+        );
     }
 }

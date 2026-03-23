@@ -2,6 +2,7 @@ package com.abhayraj.founderbrain.controller;
 
 import com.abhayraj.founderbrain.Security.JwtAuthenticationFilter;
 import com.abhayraj.founderbrain.Security.JwtService;
+import com.abhayraj.founderbrain.dto.ApiResponse;
 import com.abhayraj.founderbrain.dto.AuthRequest;
 import com.abhayraj.founderbrain.dto.AuthResponse;
 import com.abhayraj.founderbrain.model.RefreshToken;
@@ -32,10 +33,10 @@ public class AuthController {
         return "User Registered Successfully";
     }
     @PostMapping("/login")
-    public AuthResponse login(@RequestBody AuthRequest request){
+    public ApiResponse<AuthResponse> login(@RequestBody AuthRequest request){
         User user = userRepository
                 .findByEmail(request.getEmail())
-                .orElseThrow();
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (!passwordEncoder.matches(
                 request.getPassword(),
@@ -47,14 +48,19 @@ public class AuthController {
         RefreshToken refreshToken =
                 refreshTokenService.createRefreshToken(user);
 
-        return new AuthResponse(
+        AuthResponse authResponse = new AuthResponse(
                 accessToken,
                 refreshToken.getToken()
+        );
+        return new ApiResponse<>(
+                "success",
+                "Login successfully",
+                authResponse
         );
 
     }
     @PostMapping("/refresh")
-    public AuthResponse refreshToken(@RequestParam String  refreshToken){
+    public ApiResponse<AuthResponse> refreshToken(@RequestParam String  refreshToken){
         RefreshToken token = refreshTokenRepository.findByToken(refreshToken)
                 .orElseThrow(() -> new RuntimeException("Invalid refresh token"));
 
@@ -63,9 +69,14 @@ public class AuthController {
         String newAccessToken =
                 jwtService.generateToken(token.getUser().getEmail());
 
-        return new AuthResponse(
+        AuthResponse authResponse =  new AuthResponse(
                 newAccessToken,
                 refreshToken
+        );
+        return new ApiResponse<>(
+                "success",
+                "Refresh Token generated Successfully",
+                authResponse
         );
 
     }
