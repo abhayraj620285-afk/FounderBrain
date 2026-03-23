@@ -20,6 +20,7 @@ public class MetricsService {
     private final StartupRepository startupRepository;
     private final HealthCalculationService healthCalculationService;
     private final IndustryBenchmarkRepository industryBenchmarkRepository;
+    private final MlService mlService;
 
     public MetricsResponse getStartupMetrics(Long startupId) {
 
@@ -222,7 +223,7 @@ public class MetricsService {
         log.info("[startupId={}] Runway calculated: {}", startupId, runway);
         int score = healthCalculationService.calculateHealthScore(growth,runway);
         log.info("[startupId={}] Health score: {}", startupId, score);
-        String risk = healthCalculationService.determineRisk(score);
+        String risk = mlService.getRiskPrediction(startup);
         log.info("[startupId={}] Risk level: {}", startupId, risk);
         // Insights reuse
         StartupInsightResponse insights = generateInsights(startupId);
