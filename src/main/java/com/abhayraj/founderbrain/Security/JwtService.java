@@ -27,21 +27,29 @@ public class JwtService {
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
-    public String extractUser(String token){
-        return Jwts.parserBuilder()
-                .setSigningKey(SECRET.getBytes())
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-    }
+//    public String extractUser(String token){
+//        return Jwts.parserBuilder()
+//                .setSigningKey(SECRET.getBytes())
+//                .build()
+//                .parseClaimsJws(token)
+//                .getBody()
+//                .getSubject();
+//    }
+public String extractUser(String token){
+    return Jwts.parserBuilder()
+            .setSigningKey(getSignKey())   // ✅ CORRECT
+            .build()
+            .parseClaimsJws(token)
+            .getBody()
+            .getSubject();
+}
     public boolean isTokenValid(String token,String username){
         final String extractedUsername = extractUser(token);
         return (extractedUsername.equals(username) && !isTokenExpired(token));
     }
     private boolean isTokenExpired(String token) {
         Date expiration = Jwts.parserBuilder()
-                .setSigningKey(Keys.hmacShaKeyFor(SECRET.getBytes()))
+                .setSigningKey(getSignKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody()

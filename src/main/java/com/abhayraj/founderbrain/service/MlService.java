@@ -12,20 +12,21 @@ import java.util.Map;
 public class MlService {
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public String getRiskPrediction(Startup startup) {
 
-        String url = "http://127.0.0.1:8000/predict";
+public Map<String, Object> getPrediction(Startup startup) {
 
-        Map<String, Object> request = new HashMap<>();
-        request.put("revenue", startup.getRevenue());
-        request.put("lastMonthRevenue", startup.getLastMonthRevenue());
-        request.put("monthlyExpenses", startup.getMonthlyExpenses());
-        request.put("cashReserve", startup.getCashReserve());
-        request.put("users", startup.getUsers());
+    String url = "http://127.0.0.1:8000/predict";
 
-        Map<String, String> response =
-                restTemplate.postForObject(url, request, Map.class);
+    Map<String, Object> request = new HashMap<>();
+    request.put("revenue", startup.getRevenue());
+    request.put("lastMonthRevenue", startup.getLastMonthRevenue());
+    request.put("monthlyExpenses", startup.getMonthlyExpenses());
+    request.put("cashReserve", startup.getCashReserve());
+    request.put("users", startup.getUsers());
 
-        return response.get("risk");
-    }
+    Map<String, Object> response =
+            restTemplate.postForObject(url, request, Map.class);
+
+    return response;
+}
 }

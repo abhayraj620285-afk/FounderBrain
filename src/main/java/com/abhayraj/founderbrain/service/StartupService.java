@@ -36,29 +36,33 @@ public class StartupService {
         throw new RuntimeException("User not authenticated properly");
     }
     public StartupResponse createStartup(StartupRequest request) {
-        User user = getLoggedUser();
-        log.info("[userId={}] Creating startup with name={}", user.getId(), request.getName());
-        Startup startup = new Startup();
-        startup.setIndustry(request.getIndustry());
-        startup.setName(request.getName());
-        startup.setRevenue(request.getRevenue());
-        startup.setUsers(request.getUsers());
-        startup.setUser(getLoggedUser());
-        startup.setLastMonthRevenue(request.getLastMonthRevenue());
-        startup.setMonthlyExpenses(request.getMonthlyExpenses());
-        startup.setCashReserve(request.getCashReserve());
-        Startup savedStartup = startupRepository.save(startup);
-        log.info("[userId={}] Creating startup with name={}", user.getId(), request.getName());
-        return new StartupResponse(
-                savedStartup.getId(),
-                savedStartup.getName(),
-                savedStartup.getIndustry(),
-                savedStartup.getRevenue(),
-                savedStartup.getUsers(),
-                savedStartup.getLastMonthRevenue(),
-                startup.getMonthlyExpenses(),
-                startup.getCashReserve()
-        );
+        try{
+            User user = getLoggedUser();
+            log.info("[userId={}] Creating startup with name={}", user.getId(), request.getName());
+            Startup startup = new Startup();
+            startup.setIndustry(request.getIndustry());
+            startup.setName(request.getName());
+            startup.setRevenue(request.getRevenue());
+            startup.setUsers(request.getUsers());
+            startup.setUser(getLoggedUser());
+            startup.setLastMonthRevenue(request.getLastMonthRevenue());
+            startup.setMonthlyExpenses(request.getMonthlyExpenses());
+            startup.setCashReserve(request.getCashReserve());
+            Startup savedStartup = startupRepository.save(startup);
+            log.info("[userId={}] Created startup with name={}", user.getId(), request.getName());
+            return new StartupResponse(
+                    savedStartup.getId(),
+                    savedStartup.getName(),
+                    savedStartup.getIndustry(),
+                    savedStartup.getRevenue(),
+                    savedStartup.getUsers(),
+                    savedStartup.getLastMonthRevenue(),
+                    startup.getMonthlyExpenses(),
+                    startup.getCashReserve()
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
     public List<StartupResponse> getMyStartups() {
         User user = getLoggedUser();

@@ -25,10 +25,10 @@ public class AuthController {
     private final RefreshTokenRepository refreshTokenRepository;
     @PostMapping("/register")
     public String register(@RequestBody AuthRequest request){
-       User user = new User();
-       user.setEmail(request.getEmail());
-       user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(request.getRole());
+        User user = new User();
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole("FOUNDER");
         userRepository.save(user);
         return "User Registered Successfully";
     }

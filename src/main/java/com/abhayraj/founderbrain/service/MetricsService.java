@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -223,7 +225,10 @@ public class MetricsService {
         log.info("[startupId={}] Runway calculated: {}", startupId, runway);
         int score = healthCalculationService.calculateHealthScore(growth,runway);
         log.info("[startupId={}] Health score: {}", startupId, score);
-        String risk = mlService.getRiskPrediction(startup);
+        //String risk = mlService.getPrediction(startup);
+        Map<String, Object> prediction = mlService.getPrediction(startup);
+        String risk = (String) prediction.get("risk");
+        Double confidence = ((Number) prediction.get("confidence")).doubleValue();
         log.info("[startupId={}] Risk level: {}", startupId, risk);
         // Insights reuse
         StartupInsightResponse insights = generateInsights(startupId);
@@ -252,6 +257,7 @@ public class MetricsService {
                 growth,
                 runway,
                 risk,
+                confidence,
                 insights.getGrowthInsight(),
                 insights.getRunwayInsight(),
                 insights.getRiskInsight(),

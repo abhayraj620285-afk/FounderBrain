@@ -17,7 +17,7 @@ import java.util.List;
 public class StartupController {
     private final StartupService startupService;
 
-    @PreAuthorize("hasRole('FOUNDER')")
+   @PreAuthorize("hasRole('FOUNDER')")
     @PostMapping
     public ApiResponse<StartupResponse> create(@Valid @RequestBody StartupRequest request) {
         StartupResponse response =  startupService.createStartup(request);
