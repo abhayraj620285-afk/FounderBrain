@@ -4,6 +4,7 @@ import com.abhayraj.founderbrain.dto.*;
 import com.abhayraj.founderbrain.service.MetricsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.aop.framework.AopInfrastructureBean;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -22,9 +23,12 @@ public class MetricsController {
                 response
         );
     }
+    @PreAuthorize("hasAnyRole('FOUNDER','ADMIN')")
     @GetMapping("/benchmark/{startupId}")
     public ApiResponse<BenchmarkResponse> compare(@PathVariable Long startupId) {
-        BenchmarkResponse response =  metricsService.compareWithIndustry(startupId);
+
+        BenchmarkResponse response = metricsService.compareWithIndustry(startupId);
+
         return new ApiResponse<>(
                 "success",
                 "Benchmark comparison fetched",
@@ -41,6 +45,7 @@ public class MetricsController {
                 response
         );
     }
+    @PreAuthorize("hasAnyRole('FOUNDER','ADMIN')")
     @GetMapping("/insights/{startupId}")
     public ApiResponse<StartupInsightResponse> getInsights(@PathVariable Long startupId) {
 
@@ -52,7 +57,7 @@ public class MetricsController {
                 response
         );
     }
-
+    @PreAuthorize("hasAnyRole('FOUNDER','ADMIN')")
     @GetMapping("/dashboard/{startupId}")
     public ApiResponse<AnalyticsDashboardResponse> getDashboard(@PathVariable Long startupId) {
 
@@ -64,4 +69,5 @@ public class MetricsController {
                 response
         );
     }
+
 }

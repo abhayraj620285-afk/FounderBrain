@@ -17,27 +17,19 @@ public class JwtService {
     private Key getSignKey() {
         return Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
     }
-    public String generateToken(String username){
+    public String generateToken(String username,String role){
         return Jwts.builder()
                 .setSubject(username)
+                .claim("role", role)    // ← ADD THIS LINE
                 .setIssuedAt(new Date())
-                .setExpiration(
-                        new Date(System.currentTimeMillis() + 86400000)
-                )
+                .setExpiration(new Date(System.currentTimeMillis() + 86400000))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
-//    public String extractUser(String token){
-//        return Jwts.parserBuilder()
-//                .setSigningKey(SECRET.getBytes())
-//                .build()
-//                .parseClaimsJws(token)
-//                .getBody()
-//                .getSubject();
-//    }
+
 public String extractUser(String token){
     return Jwts.parserBuilder()
-            .setSigningKey(getSignKey())   // ✅ CORRECT
+            .setSigningKey(getSignKey())
             .build()
             .parseClaimsJws(token)
             .getBody()

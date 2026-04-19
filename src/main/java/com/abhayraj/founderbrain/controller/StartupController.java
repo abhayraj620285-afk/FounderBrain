@@ -2,7 +2,6 @@ package com.abhayraj.founderbrain.controller;
 import com.abhayraj.founderbrain.dto.ApiResponse;
 import com.abhayraj.founderbrain.dto.StartupRequest;
 import com.abhayraj.founderbrain.dto.StartupResponse;
-import com.abhayraj.founderbrain.model.Startup;
 import com.abhayraj.founderbrain.service.StartupService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +28,7 @@ public class StartupController {
 
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('FOUNDER')")
     @GetMapping("/my")
     public ApiResponse<List<StartupResponse>> myStartups() {
 
@@ -40,7 +39,7 @@ public class StartupController {
                 response
         );
     }
-
+    @PreAuthorize("hasAnyRole('FOUNDER','ADMIN')")
     @GetMapping("/{id}")
     public ApiResponse<StartupResponse> getOne(@PathVariable Long id) {
         StartupResponse response = startupService.getStartupById(id);
@@ -50,7 +49,7 @@ public class StartupController {
                 response
         );
     }
-
+    @PreAuthorize("hasRole('FOUNDER')")
     @PutMapping("/{id}")
     public ApiResponse<StartupResponse> update(@PathVariable Long id,
                           @Valid @RequestBody StartupRequest request) {
@@ -64,8 +63,8 @@ public class StartupController {
     }
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-
+    public ApiResponse<String> delete(@PathVariable Long id) {
         startupService.deleteStartup(id);
+        return new ApiResponse<>("success", "Startup deleted successfully", null);
     }
 }

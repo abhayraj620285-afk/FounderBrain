@@ -8,6 +8,8 @@ import com.abhayraj.founderbrain.repository.StartupRepository;
 import com.abhayraj.founderbrain.repository.UserActivityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.context.SecurityContextHolder;
+import com.abhayraj.founderbrain.model.User;
 
 import java.util.List;
 import java.util.Map;
@@ -23,6 +25,23 @@ public class MetricsService {
     private final HealthCalculationService healthCalculationService;
     private final IndustryBenchmarkRepository industryBenchmarkRepository;
     private final MlService mlService;
+
+    private void validateAccess(Startup startup) {
+        User currentUser = (User) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        // ADMIN → allow everything
+        if (currentUser.getRole().equals("ADMIN")) {
+            return;
+        }
+
+        // FOUNDER → only own startup
+        if (!startup.getUser().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("Access denied");
+        }
+    }
 
     public MetricsResponse getStartupMetrics(Long startupId) {
 
@@ -49,7 +68,7 @@ public class MetricsService {
 
         Startup startup = startupRepository.findById(startupId)
                 .orElseThrow(() -> new StartupNotFoundException("Startup not found"));
-
+        validateAccess(startup);
         double growthRate = healthCalculationService
                 .calculateGrowthRate(startup.getRevenue(), startup.getLastMonthRevenue());
 
@@ -79,41 +98,78 @@ public class MetricsService {
         };
     }
     public BenchmarkResponse compareWithIndustry(Long startupId){
+
+        // ✅ Fetch startup
         Startup startup = startupRepository.findById(startupId)
                 .orElseThrow(() -> new RuntimeException("Startup not found"));
-        double growth = healthCalculationService.calculateGrowthRate(
-                startup.getRevenue(),
-                startup.getLastMonthRevenue()
-        );
-        double runway = healthCalculationService.calculateRunway(
-                startup.getCashReserve(),
-                startup.getMonthlyExpenses()
-        );
-        IndustryBenchmark benchmark = industryBenchmarkRepository
-                .findByIndustry(startup.getIndustry())
-                .orElseThrow(() -> new RuntimeException("No benchmark found"));
+        validateAccess(startup);
+        // ✅ Handle & normalize industry (FIX for lambda issue)
+        String rawIndustry = startup.getIndustry();
 
+        if (rawIndustry == null || rawIndustry.trim().isEmpty()) {
+            throw new RuntimeException("Startup industry is missing");
+        }
+
+        final String industry = rawIndustry.trim().toLowerCase();
+
+        // ✅ Safe growth calculation
+        double growth = 0;
+        if (startup.getLastMonthRevenue() != null && startup.getLastMonthRevenue() != 0) {
+            growth = healthCalculationService.calculateGrowthRate(
+                    startup.getRevenue(),
+                    startup.getLastMonthRevenue()
+            );
+        }
+
+        // ✅ Safe runway calculation
+        double runway = 0;
+        if (startup.getMonthlyExpenses() != null && startup.getMonthlyExpenses() != 0) {
+            runway = healthCalculationService.calculateRunway(
+                    startup.getCashReserve(),
+                    startup.getMonthlyExpenses()
+            );
+        }
+
+        // ✅ Fetch benchmark safely (NO crash + lambda fixed)
+        IndustryBenchmark benchmark = industryBenchmarkRepository
+                .findByIndustryIgnoreCase(industry)
+                .orElseGet(() -> {
+                    log.warn("No benchmark found for {}. Using default.", industry);
+                    return IndustryBenchmark.builder()
+                            .industry(industry)
+                            .averageGrowthRate(15.0)
+                            .averageRunwayMonths(10.0)
+                            .build();
+                });
+
+        // ✅ Null-safe benchmark values
+        double avgGrowth = benchmark.getAverageGrowthRate() != null
+                ? benchmark.getAverageGrowthRate() : 0;
+
+        double avgRunway = benchmark.getAverageRunwayMonths() != null
+                ? benchmark.getAverageRunwayMonths() : 0;
+
+        // ✅ Performance logic
         String performance;
-        if(growth> benchmark.getAverageGrowthRate() && runway> benchmark.getAverageRunwayMonths()){
+
+        if (growth > avgGrowth && runway > avgRunway) {
             performance = "Above Industry Average";
-        }
-        else if(growth> benchmark.getAverageGrowthRate()){
-            performance =  "Strong Growth but Weak Runway";
-        }
-        else if(runway > benchmark.getAverageRunwayMonths()){
+        } else if (growth > avgGrowth) {
+            performance = "Strong Growth but Weak Runway";
+        } else if (runway > avgRunway) {
             performance = "Stable but Slow Growth";
-        }
-        else {
+        } else {
             performance = "Below Industry Average";
         }
+
+        // ✅ Final response
         return new BenchmarkResponse(
                 growth,
-                benchmark.getAverageGrowthRate(),
+                avgGrowth,
                 runway,
-                benchmark.getAverageRunwayMonths(),
+                avgRunway,
                 performance
         );
-
     }
     public FundingResponse analyzeFunding(Long startupId){
         Startup startup = startupRepository.findById(startupId)
@@ -213,6 +269,7 @@ public class MetricsService {
         log.info("[startupId={}] Fetching dashboard", startupId);
         Startup startup = startupRepository.findById(startupId)
                 .orElseThrow(()-> new RuntimeException("Exception not found"));
+        validateAccess(startup);
         double growth = healthCalculationService.calculateGrowthRate(
                 startup.getRevenue(),
                 startup.getLastMonthRevenue()
@@ -246,7 +303,7 @@ public class MetricsService {
         // Dummy benchmark (replace later with DB)
         // Benchmark from DB
         IndustryBenchmark benchmark = industryBenchmarkRepository
-                .findByIndustry(startup.getIndustry())
+                .findByIndustryIgnoreCase(startup.getIndustry())
                 .orElseThrow(() -> new RuntimeException("Benchmark not found"));
 
         double avgGrowth = benchmark.getAverageGrowthRate();

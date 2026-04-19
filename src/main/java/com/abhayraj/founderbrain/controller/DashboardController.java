@@ -18,7 +18,7 @@ public class DashboardController {
     public ApiResponse<DashboardResponse> getDashboard() {
 
         DashboardResponse response =  dashboardService.getDashboard();
-        return new ApiResponse<>(
+        return new  ApiResponse<>(
                 "success",
                 "Get Dashboard successfully",
                 response

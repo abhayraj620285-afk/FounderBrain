@@ -147,7 +147,7 @@ public class StartupService {
         );
 
     }
-    public void deleteStartup(long id){
+    public void deleteStartup(Long id){
     User user = getLoggedUser();
         log.info("[userId={}] Deleting startup id={}", user.getId(), id);
         Startup startup = startupRepository.findById(id)

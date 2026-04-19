@@ -44,7 +44,7 @@ public class AuthController {
 
             throw new RuntimeException("Invalid credentials");
         }
-        String accessToken = jwtService.generateToken(user.getEmail());
+        String accessToken = jwtService.generateToken(user.getEmail(),user.getRole());
         RefreshToken refreshToken =
                 refreshTokenService.createRefreshToken(user);
 
@@ -65,9 +65,10 @@ public class AuthController {
                 .orElseThrow(() -> new RuntimeException("Invalid refresh token"));
 
         refreshTokenService.verifyExpiration(token);
+        User user = token.getUser();
 
         String newAccessToken =
-                jwtService.generateToken(token.getUser().getEmail());
+                jwtService.generateToken(user.getEmail(), user.getRole());
 
         AuthResponse authResponse =  new AuthResponse(
                 newAccessToken,

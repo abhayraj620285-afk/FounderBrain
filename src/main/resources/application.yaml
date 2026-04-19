@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/founderbrain
-    username: abhayraj
-    password:
+    url: jdbc:postgresql://maglev.proxy.rlwy.net:39546/railway?sslmode=require
+    username: postgres
+    password: McDzmajGeybGrDmnEqLZhScmuNZSsxUQ
 
   jpa:
     hibernate:
@@ -11,6 +11,9 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+
 
   security:
     user:
