@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://maglev.proxy.rlwy.net:39546/railway?sslmode=require
-    username: postgres
-    password: McDzmajGeybGrDmnEqLZhScmuNZSsxUQ
+    url: ${DB_URL}
+    username:  ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
   jpa:
     hibernate:
@@ -11,7 +11,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        dialect: ${HIBERNATE_DIALECT}
 
 
 
@@ -21,4 +21,10 @@ spring:
       password: admin
 
 server:
-  port: 8080
+  port: ${PORT:8080}
+
+jwt:
+  secret: ${JWT_SECRET:myverystrongsecretkeymyverystrongsecretkey}
+
+
+

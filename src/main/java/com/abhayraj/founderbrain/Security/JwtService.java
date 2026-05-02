@@ -3,6 +3,7 @@ package com.abhayraj.founderbrain.Security;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -12,8 +13,9 @@ import java.util.Date;
 
 @Service
 public class JwtService {
-    private static final String SECRET =
-            "myverystrongsecretkeymyverystrongsecretkey";
+    @Value("${jwt.secret}")
+    private String SECRET ;
+
     private Key getSignKey() {
         return Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
     }
