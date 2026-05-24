@@ -3,6 +3,18 @@ spring:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 2
+      max-lifetime: 55000
+      keepalive-time: 30000
+      connection-timeout: 20000
+      idle-timeout: 30000
+      connection-test-query: SELECT 1
+      data-source-properties:
+        prepareThreshold: 0        # ✅ Fixes "prepared statement already exists"
+        preparedStatementCacheQueries: 0
 
   jpa:
     hibernate:
@@ -11,7 +23,9 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        dialect: ${HIBERNATE_DIALECT}
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          use_get_generated_keys: true
 
   security:
     user:
@@ -22,4 +36,4 @@ server:
   port: ${PORT:8080}
 
 jwt:
-  secret: ${JWT_SECRET:myverystrongsecretkeymyverystrongsecretkey}
+  secret: ${JWT_SECRET}
