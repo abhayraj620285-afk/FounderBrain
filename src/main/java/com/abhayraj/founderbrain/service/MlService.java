@@ -15,7 +15,7 @@ public class MlService {
 
 public Map<String, Object> getPrediction(Startup startup) {
 
-    String url = "http://127.0.0.1:8000/predict";
+    String url =System.getenv("ML_SERVICE_URL") + "/predict";
 
     Map<String, Object> request = new HashMap<>();
     request.put("revenue", startup.getRevenue());
