@@ -15,7 +15,8 @@ public class MlService {
 
 public Map<String, Object> getPrediction(Startup startup) {
 
-     String mlServiceUrl = "https://founderbrain-ml-model.onrender.com";
+    String url ="https://founderbrain-ml-model.onrender.com";
+
     Map<String, Object> request = new HashMap<>();
     request.put("revenue", startup.getRevenue());
     request.put("lastMonthRevenue", startup.getLastMonthRevenue());
