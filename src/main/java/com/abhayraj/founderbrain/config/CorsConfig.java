@@ -17,7 +17,7 @@ public class CorsConfig {
 
         config.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                "https://founder-fronted.vercel.app"
+                "http://a783cb2fdf1564ae08b5b2f175f6d6f4-625988798.us-east-1.elb.amazonaws.com"
         ));
 
         config.setAllowedMethods(List.of(
