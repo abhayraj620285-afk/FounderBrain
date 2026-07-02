@@ -17,7 +17,7 @@ public class CorsConfig {
 
         config.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                "http://a783cb2fdf1564ae08b5b2f175f6d6f4-625988798.us-east-1.elb.amazonaws.com"
+                "http://a1cd3d998db524d73be3d7f5c8581c8d-825598436.us-east-1.elb.amazonaws.com"
         ));
 
         config.setAllowedMethods(List.of(
